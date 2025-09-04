@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Richard Fitness - Admin Dashboard</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--space-6);
+            margin-top: 5rem;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .admin-nav {
+            display: flex;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+        
+        .admin-nav button {
+            padding: var(--space-3) var(--space-6);
+            border: 1px solid var(--gray-300);
+            background: white;
+            color: var(--gray-700);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        
+        .admin-nav button.active {
+            background: var(--primary-600);
+            color: white;
+            border-color: var(--primary-600);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+        
+        .stat-card {
+            background: white;
+            padding: var(--space-6);
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+        
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .stat-icon.users { background: var(--primary-600); }
+        .stat-icon.revenue { background: var(--success); }
+        .stat-icon.bookings { background: var(--warning); }
+        .stat-icon.contacts { background: var(--error); }
+        
+        .stat-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--gray-900);
+            margin-bottom: var(--space-1);
+        }
+        
+        .stat-label {
+            color: var(--gray-600);
+            font-size: var(--font-size-sm);
+        }
+        
+        .admin-section {
+            background: white;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--gray-200);
+            overflow: hidden;
+            margin-bottom: var(--space-6);
+        }
+        
+        .section-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--gray-200);
+            background: var(--gray-50);
+        }
+        
+        .section-content {
+            padding: var(--space-6);
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th,
+        .table td {
+            padding: var(--space-3) var(--space-4);
+            text-align: left;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .table th {
+            background: var(--gray-50);
+            font-weight: var(--font-weight-semibold);
+            color: var(--gray-700);
+        }
+        
+        .status-badge {
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+        }
+        
+        .status-active { background: #dcfce7; color: #166534; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-cancelled { background: #fee2e2; color: #991b1b; }
+        
+        .loading {
+            text-align: center;
+            padding: var(--space-8);
+            color: var(--gray-500);
+        }
+        
+        .error {
+            text-align: center;
+            padding: var(--space-8);
+            color: var(--error);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <h2><i class="fas fa-dumbbell"></i> Richard Fitness Admin</h2>
+                </div>
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <a href="index.html" class="cta-button">
+                        <i class="fas fa-home"></i>
+                        View Site
+                    </a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Admin Dashboard -->
+    <div class="admin-container">
+        <div class="admin-header">
+            <div>
+                <h1>Admin Dashboard</h1>
+                <p>Manage your gym operations</p>
+            </div>
+            <div>
+                <button class="btn btn-primary" onclick="refreshDashboard()">
+                    <i class="fas fa-refresh"></i>
+                    Refresh
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="admin-nav">
+            <button class="active" onclick="showSection('dashboard')">
+                <i class="fas fa-chart-bar"></i>
+                Dashboard
+            </button>
+            <button onclick="showSection('users')">
+                <i class="fas fa-users"></i>
+                Users
+            </button>
+            <button onclick="showSection('memberships')">
+                <i class="fas fa-credit-card"></i>
+                Memberships
+            </button>
+            <button onclick="showSection('bookings')">
+                <i class="fas fa-calendar"></i>
+                Bookings
+            </button>
+            <button onclick="showSection('contacts')">
+                <i class="fas fa-envelope"></i>
+                Contacts
+            </button>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboard-section">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="total-users">-</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="stat-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="total-revenue">-</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                        <div class="stat-icon revenue">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="total-bookings">-</div>
+                            <div class="stat-label">Total Bookings</div>
+                        </div>
+                        <div class="stat-icon bookings">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-value" id="pending-contacts">-</div>
+                            <div class="stat-label">Pending Contacts</div>
+                        </div>
+                        <div class="stat-icon contacts">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3>Recent Activity</h3>
+                </div>
+                <div class="section-content">
+                    <div id="recent-activity" class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading recent activity...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Section -->
+        <div id="users-section" style="display: none;">
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3>Users Management</h3>
+                </div>
+                <div class="section-content">
+                    <div id="users-content" class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading users...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other sections would be similar -->
+        <div id="memberships-section" style="display: none;">
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3>Memberships Management</h3>
+                </div>
+                <div class="section-content">
+                    <p>Membership management interface would be implemented here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="bookings-section" style="display: none;">
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3>Bookings Management</h3>
+                </div>
+                <div class="section-content">
+                    <p>Booking management interface would be implemented here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="contacts-section" style="display: none;">
+            <div class="admin-section">
+                <div class="section-header">
+                    <h3>Contact Inquiries</h3>
+                </div>
+                <div class="section-content">
+                    <div id="contacts-content" class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Loading contacts...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/script.js"></script>
+    <script>
+        // Admin Dashboard JavaScript
+        const API_BASE_URL = window.location.origin + '/api';
+        let currentSection = 'dashboard';
+
+        // Initialize admin dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdminAuth();
+            loadDashboardData();
+        });
+
+        async function checkAdminAuth() {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                redirectToLogin();
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Authentication failed');
+                }
+
+                const result = await response.json();
+                if (result.data.user.role !== 'admin') {
+                    alert('Access denied. Admin privileges required.');
+                    window.location.href = 'index.html';
+                    return;
+                }
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                redirectToLogin();
+            }
+        }
+
+        function redirectToLogin() {
+            alert('Please login as an admin to access this page.');
+            window.location.href = 'index.html';
+        }
+
+        async function loadDashboardData() {
+            const token = localStorage.getItem('authToken');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/dashboard`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load dashboard data');
+                }
+
+                const result = await response.json();
+                updateDashboardUI(result.data);
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+                showError('Failed to load dashboard data');
+            }
+        }
+
+        function updateDashboardUI(data) {
+            // Update stats
+            document.getElementById('total-users').textContent = data.stats.users.total || 0;
+            document.getElementById('total-revenue').textContent = `$${(data.stats.revenue.total || 0).toLocaleString()}`;
+            document.getElementById('total-bookings').textContent = data.stats.bookings.total || 0;
+            document.getElementById('pending-contacts').textContent = data.stats.contacts.pending || 0;
+
+            // Update recent activity
+            const activityContainer = document.getElementById('recent-activity');
+            if (data.recentActivity && data.recentActivity.users) {
+                activityContainer.innerHTML = `
+                    <h4>Recent Users</h4>
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.recentActivity.users.map(user => `
+                                    <tr>
+                                        <td>${user.firstName} ${user.lastName}</td>
+                                        <td>${user.email}</td>
+                                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } else {
+                activityContainer.innerHTML = '<p>No recent activity</p>';
+            }
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('[id$="-section"]').forEach(section => {
+                section.style.display = 'none';
+            });
+
+            // Show selected section
+            document.getElementById(`${sectionName}-section`).style.display = 'block';
+
+            // Update navigation
+            document.querySelectorAll('.admin-nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            currentSection = sectionName;
+
+            // Load section data
+            if (sectionName === 'users') {
+                loadUsers();
+            } else if (sectionName === 'contacts') {
+                loadContacts();
+            }
+        }
+
+        async function loadUsers() {
+            const token = localStorage.getItem('authToken');
+            const usersContent = document.getElementById('users-content');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/users/admin/all`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load users');
+                }
+
+                const result = await response.json();
+                
+                usersContent.innerHTML = `
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Membership</th>
+                                    <th>Status</th>
+                                    <th>Joined</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${result.data.users.map(user => `
+                                    <tr>
+                                        <td>${user.firstName} ${user.lastName}</td>
+                                        <td>${user.email}</td>
+                                        <td><span class="status-badge status-${user.role}">${user.role}</span></td>
+                                        <td>${user.membership?.planName || 'None'}</td>
+                                        <td><span class="status-badge status-${user.membershipStatus}">${user.membershipStatus}</span></td>
+                                        <td>${new Date(user.createdAt).toLocaleDateString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load users:', error);
+                usersContent.innerHTML = '<div class="error">Failed to load users</div>';
+            }
+        }
+
+        async function loadContacts() {
+            const token = localStorage.getItem('authToken');
+            const contactsContent = document.getElementById('contacts-content');
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/contact`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load contacts');
+                }
+
+                const result = await response.json();
+                
+                contactsContent.innerHTML = `
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Subject</th>
+                                    <th>Status</th>
+                                    <th>Priority</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${result.data.contacts.map(contact => `
+                                    <tr>
+                                        <td>${contact.name}</td>
+                                        <td>${contact.email}</td>
+                                        <td>${contact.subject}</td>
+                                        <td><span class="status-badge status-${contact.status}">${contact.status}</span></td>
+                                        <td><span class="status-badge status-${contact.priority}">${contact.priority}</span></td>
+                                        <td>${new Date(contact.createdAt).toLocaleDateString()}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load contacts:', error);
+                contactsContent.innerHTML = '<div class="error">Failed to load contacts</div>';
+            }
+        }
+
+        function refreshDashboard() {
+            if (currentSection === 'dashboard') {
+                loadDashboardData();
+            } else if (currentSection === 'users') {
+                loadUsers();
+            } else if (currentSection === 'contacts') {
+                loadContacts();
+            }
+        }
+
+        function showError(message) {
+            showNotification(message, 'error');
+        }
+    </script>
+</body>
+</html>
