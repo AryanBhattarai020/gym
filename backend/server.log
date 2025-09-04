@@ -1,0 +1,14 @@
+nohup: ignoring input
+[dotenv@17.2.2] injecting env (15) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.2] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+(node:8375) [MONGOOSE] Warning: Duplicate schema index on {"email":1} found. This is often due to declaring an index using both "index: true" and "schema.index()". Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8375) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:8375) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+🚀 Server running on port 5000
+🌐 Frontend: http://localhost:5000
+🔗 API: http://localhost:5000/api
+👨‍💼 Admin: http://localhost:5000/admin.html
+::1 - - [04/Sep/2025:12:04:34 +0000] "GET / HTTP/1.1" 200 22519 "-" "curl/8.12.1"
+::1 - - [04/Sep/2025:12:04:39 +0000] "GET /api/health HTTP/1.1" 200 76 "-" "curl/8.12.1"
+⚠️  MongoDB not available, running in demo mode
