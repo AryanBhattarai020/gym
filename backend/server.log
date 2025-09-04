@@ -12,3 +12,5 @@ nohup: ignoring input
 ::1 - - [04/Sep/2025:12:04:34 +0000] "GET / HTTP/1.1" 200 22519 "-" "curl/8.12.1"
 ::1 - - [04/Sep/2025:12:04:39 +0000] "GET /api/health HTTP/1.1" 200 76 "-" "curl/8.12.1"
 ⚠️  MongoDB not available, running in demo mode
+::1 - - [04/Sep/2025:12:05:57 +0000] "GET / HTTP/1.1" 200 22519 "-" "curl/8.12.1"
+::1 - - [04/Sep/2025:12:06:02 +0000] "GET /api/health HTTP/1.1" 200 76 "-" "curl/8.12.1"
